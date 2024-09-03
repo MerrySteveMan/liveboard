@@ -1,0 +1,31 @@
+<html>
+    <body>
+    <div style="display: flex;">
+        <div id = "mommy" style="background-color: rgb(30,30,30);color:white; width: 300px; margin: 5px; border-radius: 20px;">
+            <p>Color:       <input type="color" value="#ff0000">    </p>
+            <p>Backround:   <input type="color" value="#000000" id="background">    </p>
+
+        </div>
+        <canvas id="canvas" width="1400" height="800" style="background-color: black; ">
+        </canvas>
+    </div>
+    </body>
+
+    <script src="smartcanvas.js"></script>
+    <script src="smartInputs.js"></script>
+
+    <script>
+        let canv = document.getElementById("canvas")
+        let mommy = document.getElementById("mommy")
+        let sc = new SmartCanvas(canv)
+
+        let slid = new Slider(0,10,4)
+        mommy.appendChild(slid.DOM)
+
+        slid.setLink(sc.ctx, "lineWidth")
+
+        document.getElementById("background").oninput = function(){
+            canv.style.backgroundColor = document.getElementById("background").value
+        }
+</script>
+</html>
