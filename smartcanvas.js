@@ -46,6 +46,8 @@ class SmartCanvas {
         eta.ctx.lineWidth = size
         eta.ctx.stroke()
         eta.ctx.beginPath()
+        eta.ctx.strokeStyle = document.querySelector("input[type='color']").value;
+        eta.ctx.lineWidth = document.querySelector("input[type='number']").value;
     }
 }
 
