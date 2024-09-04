@@ -5,6 +5,7 @@ class SmartCanvas {
         this.canvasElement = canvasElement
         this.ctx = canvasElement.getContext("2d")
         this.bounds = canvasElement.getBoundingClientRect()
+        this.pathPoints = []
         canvases.push(this)
         let eta = this
         let mostrecentMousePos = {x:0,y:0}
@@ -15,8 +16,7 @@ class SmartCanvas {
                     e = bypass || e
                     ctx.lineTo(e.x - eta.bounds.left , e.y- eta.bounds.top);
                     ctx.stroke()
-                   // ctx.beginPath();
-                   // ctx.moveTo(e.x - eta.bounds.left , e.y- eta.bounds.top)
+                    eta.pathPoints.push([e.x - eta.bounds.left , e.y- eta.bounds.top])
                 }else{
                     mostrecentMousePos.x=e.x
                     mostrecentMousePos.y=e.y
@@ -30,7 +30,23 @@ class SmartCanvas {
             }
         })
     }
-    
+    draw(posInfo, size,color){
+        if (posInfo.length < 2) {
+            return "not a line"
+        }
+        let eta = this
+        eta.ctx.beginPath()
+        eta.ctx.moveTo(posInfo[0][0],posInfo[0][1])
+
+        for (let i = 1; i < posInfo.length; i ++) {
+            eta.ctx.lineTo(posInfo[i][0],posInfo[i][1])
+        }
+
+        eta.ctx.strokeStyle = color
+        eta.ctx.lineWidth = size
+        eta.ctx.stroke()
+        eta.ctx.beginPath()
+    }
 }
 
 
@@ -42,11 +58,17 @@ document.onmousedown = function(e){
         canv.ctx.strokeStyle = document.querySelector("input[type='color']").value;
         canv.ctx.moveTo(e.clientX - canv.bounds.left, e.clientY - canv.bounds.top)
         console.log("SIGMA")
+        canv.pathPoints = [[e.clientX - canv.bounds.left, e.clientY - canv.bounds.top]]
     })
 }
 
 document.onmouseup = function(){
     mousedown = false 
+    canvases.forEach( canv=>{
+        if (canv.onRelease) {
+            canv.onRelease()
+        }
+    })
 }
 
 document.onmousemove = function(me){

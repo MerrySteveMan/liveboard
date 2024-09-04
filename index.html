@@ -15,7 +15,17 @@
     <script src="smartInputs.js"></script>
 
     <script type="module">
-
+        function reduce(l1,p){
+            p = p || 0
+            return l1.map(a=>{
+                return Math.round(a * 10^p) / 10^p
+            })
+        }
+        function reduce2(l2,p){
+            return l2.map(l1=>{
+                return reduce(l1,p)
+            })
+        }
         let canv = document.getElementById("canvas")
         let mommy = document.getElementById("mommy")
         let sc = new SmartCanvas(canv)
@@ -29,19 +39,39 @@
             canv.style.backgroundColor = document.getElementById("background").value
         }
 
+        let last = -1
         async function name(params) {
-            let stream = (await fetch(`../.netlify/functions/hello-world`)).body
+            let stream = (await fetch(`../.netlify/functions/hello-world/?from=${last + 1}`)).body
             let read = await stream.getReader()
             let stuff = await read.read()
             let data = await JSON.parse(new TextDecoder().decode(stuff.value))
             console.log(data)   
-            
-            await  new Promise(resolve => setTimeout(resolve, 2000));
+            if (data.length >0) {
+                last = data[data.length - 1].id
+            }
+
+            data.forEach(sketch=>{
+                sc.draw(sketch.data.info,sketch.data.width ,sketch.data.color)
+            })
+            await  new Promise(resolve => setTimeout(resolve, 1033));
             name()
 
 
         }
         name()
 
+        sc.onRelease = function(){
+            upload("line",sc.pathPoints,sc.ctx.lineWidth ,sc.ctx.strokeStyle)
+        }
+
+        async function upload(drawtype,posInfo, size,color) {
+            console.log("BOZOZ")
+            let call = await fetch(`../.netlify/functions/hello-world/?type=post`,
+            {
+                method:"POST",
+                body: JSON.stringify([drawtype,reduce2(posInfo,1),size,color])
+            })
+            console.log(call.body)
+        }
 </script>
 </html>
