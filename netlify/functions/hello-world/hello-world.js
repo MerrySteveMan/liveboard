@@ -52,7 +52,8 @@ const handler = async (event) => {
     }else if (type == "post") {
       let a = event.body
       a= JSON.parse(a)
-     
+      console.log(zone)
+
       let { data, error } = await supabase.from(zone).insert({roomnum:roomNumber, data:{type:a[0], info:reduce(a[1]),width:a[2],color:a[3]}})
 
       if (error){

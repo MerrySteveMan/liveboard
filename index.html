@@ -15,6 +15,9 @@
     <script src="smartInputs.js"></script>
 
     <script type="module">
+        let params = new URLSearchParams(window.location.search);
+        let zone = params.get("zone") || "UCC"
+        let room = params.get("room") || "0"
         function reduce(l1,p){
             p = p || 0
             return l1.map(a=>{
@@ -41,7 +44,7 @@
 
         let last = -1
         async function name(params) {
-            let stream = (await fetch(`../.netlify/functions/hello-world/?from=${last + 1}`)).body
+            let stream = (await fetch(`../.netlify/functions/hello-world/?from=${last + 1}&zoneName=${zone}&roomNumber=${room}`)).body
             let read = await stream.getReader()
             let stuff = await read.read()
             let data = await JSON.parse(new TextDecoder().decode(stuff.value))
@@ -66,7 +69,7 @@
 
         async function upload(drawtype,posInfo, size,color) {
             console.log("BOZOZ")
-            let call = await fetch(`../.netlify/functions/hello-world/?type=post`,
+            let call = await fetch(`../.netlify/functions/hello-world/?type=post&zoneName=${zone}&roomNumber=${room}`,
             {
                 method:"POST",
                 body: JSON.stringify([drawtype,reduce2(posInfo,1),size,color])
