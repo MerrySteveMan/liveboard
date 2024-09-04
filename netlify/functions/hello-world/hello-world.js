@@ -10,8 +10,13 @@
 })
 
 function reduce(list){
-  if (list.length <= 100){
+  if (list.length <= 67){
     return list
+  }
+
+  if (list.length <=100) {
+    return reduce(list.filter((a,i)=>i % 3 <= 1))
+
   }
   
   return reduce(list.filter((a,i)=>i % 2 == 0))
@@ -36,8 +41,8 @@ const handler = async (event) => {
         }   
       }
 
-      if (data.length>=150){
-        let id150 = data[data.length - 150].id
+      if (data.length>=75){
+        let id150 = data[data.length - 75].id
         data = data.filter(a=>a.id > id150)
       }
       return {
