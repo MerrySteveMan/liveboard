@@ -14,12 +14,13 @@
     <script src="smartcanvas.js"></script>
     <script src="smartInputs.js"></script>
 
-    <script>
+    <script type="module">
+
         let canv = document.getElementById("canvas")
         let mommy = document.getElementById("mommy")
         let sc = new SmartCanvas(canv)
 
-        let slid = new Slider(0,10,4)
+        let slid = new Slider(0,25,4)
         mommy.appendChild(slid.DOM)
 
         slid.setLink(sc.ctx, "lineWidth")
@@ -27,5 +28,20 @@
         document.getElementById("background").oninput = function(){
             canv.style.backgroundColor = document.getElementById("background").value
         }
+
+        async function name(params) {
+            let stream = (await fetch(`../.netlify/functions/hello-world`)).body
+            let read = await stream.getReader()
+            let stuff = await read.read()
+            let data = await JSON.parse(new TextDecoder().decode(stuff.value))
+            console.log(data)   
+            
+            await  new Promise(resolve => setTimeout(resolve, 2000));
+            name()
+
+
+        }
+        name()
+
 </script>
 </html>
