@@ -9,6 +9,14 @@
   }
 })
 
+function reduce(list){
+  if (list.length <= 100){
+    return list
+  }
+  
+  return reduce(list.filter((a,i)=>i % 2 == 0))
+}
+
 const handler = async (event) => {
   try {
     const type = event.queryStringParameters.type  || "get"
@@ -27,6 +35,11 @@ const handler = async (event) => {
           body: JSON.stringify(`{error: ${error}`),
         }   
       }
+
+      if (data.length>=150){
+        let id150 = data[data.length - 150].id
+        data = data.filter(a=>a.id > id150)
+      }
       return {
         statusCode: 200,
         body: JSON.stringify(data),
@@ -35,7 +48,7 @@ const handler = async (event) => {
       let a = event.body
       a= JSON.parse(a)
      
-      let { data, error } = await supabase.from(zone).insert({roomnum:roomNumber, data:{type:a[0], info:a[1],width:a[2],color:a[3]}})
+      let { data, error } = await supabase.from(zone).insert({roomnum:roomNumber, data:{type:a[0], info:reduce(a[1]),width:a[2],color:a[3]}})
 
       if (error){
         return {
