@@ -10,15 +10,18 @@
 })
 
 function reduce(list){
-  if (list.length <= 80){
+  if (list.length <= 100){
     return list
   }
 
-  if (list.length <=105) {
+  if (list.length <=133) {
     return reduce(list.filter((a,i)=>i % 4 <= 2))
 
   }
 
+  if (list.length <= 166){
+    return reduce(list.filter((a,i)=>i % 3 <= 1))
+  }
 
   return reduce(list.filter((a,i)=>i % 2 == 0))
 }
