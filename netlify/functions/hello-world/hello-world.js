@@ -45,8 +45,8 @@ const handler = async (event) => {
         }   
       }
 
-      if (data.length>=78){
-        let id150 = data[data.length - 78].id
+      if (data.length>=100){
+        let id150 = data[data.length - 100].id
         data = data.filter(a=>a.id > id150)
       }
       return {
