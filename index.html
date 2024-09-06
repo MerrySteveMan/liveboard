@@ -1,4 +1,11 @@
 <html>
+    <head>
+        <style>
+            .selected {
+                border: 2px solid blue;
+            }
+        </style>
+    </head>
     <body>
     <div style="display: flex;">
         <div id = "mommy" style="background-color: rgb(30,30,30);color:white; width: 300px; margin: 5px; border-radius: 20px;">
@@ -36,6 +43,15 @@
         let slid = new Slider(0,25,4)
         mommy.appendChild(slid.DOM)
 
+        let rad = new Radio([
+            {title:"pen"},
+            {title:"eraser"},
+        ])
+        mommy.appendChild(rad.DOM)
+
+        rad.setLink(sc,"tool")
+        rad.selected = "pen"
+
         slid.setLink(sc.ctx, "lineWidth")
 
         document.getElementById("background").oninput = function(){
@@ -54,7 +70,11 @@
             }
 
             data.forEach(sketch=>{
-                sc.draw(sketch.data.info,sketch.data.width ,sketch.data.color)
+                if (sketch.data.type == "pen" || sketch.data.type == "line"){
+                    sc.draw(sketch.data.info,sketch.data.width ,sketch.data.color)
+                } else if (sketch.data.type == "eraser"){
+                    sc.erase(sketch.data.info,sketch.data.width ,sketch.data.color)
+                }
             })
             await  new Promise(resolve => setTimeout(resolve, 1033));
             name()
@@ -64,11 +84,11 @@
         name()
 
         sc.onRelease = function(){
-            upload("line",sc.pathPoints,sc.ctx.lineWidth ,sc.ctx.strokeStyle)
+
+            upload(sc.tool,sc.pathPoints,sc.ctx.lineWidth ,sc.ctx.strokeStyle)
         }
 
         async function upload(drawtype,posInfo, size,color) {
-            console.log("BOZOZ")
             let call = await fetch(`../.netlify/functions/hello-world/?type=post&zoneName=${zone}&roomNumber=${room}`,
             {
                 method:"POST",

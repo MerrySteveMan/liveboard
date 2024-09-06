@@ -4,22 +4,38 @@ class SmartCanvas {
     constructor(canvasElement) {
         this.canvasElement = canvasElement
         this.ctx = canvasElement.getContext("2d")
+        this.ctx.lineJoin = "round"
         this.bounds = canvasElement.getBoundingClientRect()
         this.pathPoints = []
+        this.tool = "pen"
         canvases.push(this)
         let eta = this
         let mostrecentMousePos = {x:0,y:0}
         this.canvasElement.onmousemove = function(e,bypass){
-            if (mousedown  ) {
-                if (!e.shiftKey || bypass){
-                    let ctx = eta.ctx
-                    e = bypass || e
-                    ctx.lineTo(e.x - eta.bounds.left , e.y- eta.bounds.top);
-                    ctx.stroke()
+            if (mousedown) {
+                let ctx = eta.ctx
+                if (eta.tool == "pen"){
+                    if (!e.shiftKey || bypass){
+                        e = bypass || e
+                        ctx.lineTo(e.x - eta.bounds.left , e.y- eta.bounds.top);
+                        ctx.stroke()
+                        eta.pathPoints.push([e.x - eta.bounds.left , e.y- eta.bounds.top])
+                    }else{
+                        mostrecentMousePos.x=e.x
+                        mostrecentMousePos.y=e.y
+                    }
+                }else if (eta.tool == "eraser") {
+                    let l = eta.pathPoints.length
                     eta.pathPoints.push([e.x - eta.bounds.left , e.y- eta.bounds.top])
-                }else{
-                    mostrecentMousePos.x=e.x
-                    mostrecentMousePos.y=e.y
+                    let p0 = eta.pathPoints[l]
+                    let p1 = eta.pathPoints[l-1]
+                    let w = eta.ctx.lineWidth
+
+                    let minX = Math.min(p0[0],p1[0])
+                    let minY = Math.min(p0[1],p1[1])
+                    let maxX = Math.max(p0[0],p1[0])
+                    let maxY = Math.max(p0[1],p1[1])
+                    eta.ctx.clearRect(minX - w, minY - w, maxX + 2*w - minX, maxY + 2*w - minY);
                 }
             }
         }
@@ -45,6 +61,30 @@ class SmartCanvas {
         eta.ctx.strokeStyle = color
         eta.ctx.lineWidth = size
         eta.ctx.stroke()
+        eta.ctx.beginPath()
+        eta.ctx.strokeStyle = document.querySelector("input[type='color']").value;
+        eta.ctx.lineWidth = document.querySelector("input[type='number']").value;
+    }
+    erase(posInfo, size,color){
+        if (posInfo.length < 2) {
+            return "not an erase"
+        }
+        let eta = this
+
+
+        for (let i = 1; i < posInfo.length; i ++) {
+            let p0 = posInfo[i]
+            let p1 = posInfo[i-1]
+            let w = size
+
+            let minX = Math.min(p0[0],p1[0])
+            let minY = Math.min(p0[1],p1[1])
+            let maxX = Math.max(p0[0],p1[0])
+            let maxY = Math.max(p0[1],p1[1])
+            eta.ctx.clearRect(minX - w, minY - w, maxX + 2*w - minX, maxY + 2*w - minY);
+        }
+
+       
         eta.ctx.beginPath()
         eta.ctx.strokeStyle = document.querySelector("input[type='color']").value;
         eta.ctx.lineWidth = document.querySelector("input[type='number']").value;
